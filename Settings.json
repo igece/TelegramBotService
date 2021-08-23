@@ -1,0 +1,19 @@
+{
+  "Service": {
+    "Name": "TelegramBot",
+    "DisplayName":  "Telegram bot",
+    "Description": "Windows service implementing a Telegram bot"
+  },
+
+  "Bot": {
+    "Token": ""
+  },
+
+  "Database": {
+    "Path": "./TelegramBot.db"
+  },
+
+  "Logging": {
+    "File": "%LOCALAPPDATA%\\igece.labs\\TelegramBot\\TelegramBot_.log"
+  }
+}
