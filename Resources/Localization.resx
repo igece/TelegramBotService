@@ -118,10 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BotStarted" xml:space="preserve">
-    <value>Bot started</value>
+    <value>Bot started xxx</value>
   </data>
   <data name="ErrorProcessingRequest" xml:space="preserve">
     <value>Cannot process request: {0}</value>
+  </data>
+  <data name="Pong" xml:space="preserve">
+    <value>Pong!</value>
+  </data>
+  <data name="UnknownCommand" xml:space="preserve">
+    <value>Unknown command</value>
   </data>
   <data name="WelcomeMessage" xml:space="preserve">
     <value>Welcome!</value>

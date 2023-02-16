@@ -1,47 +1,55 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Microsoft.Extensions.Logging;
-
-using Telegram.Bot;
+﻿using TelegramBotService.Services;
 
 
 namespace TelegramBotService.Commands
 {
-  abstract class BaseCommand : ICommand
-  {
-    public abstract string Name { get; }
-
-    public string Request { get; private set; }
-
-
-    public async Task Execute(string request, ITelegramBotClient client, long chatId, ILogger logger, IServiceProvider serviceProvider)
+    abstract class BaseCommand : ICommand
     {
-      Request = request;
-      var args = GetArguments(request);
+        public abstract string Name { get; }
 
-      try
-      {
-        await Execute(args, client, chatId, logger, serviceProvider);
-      }
+        public string? Request { get; private set; }
 
-      catch (Exception ex)
-      {
-        logger.LogError($"Cannot execute command /{Name}", ex);
-        await client.SendTextMessageAsync(chatId, string.Format(Resources.Strings.ErrorProcessingRequest, ex.Message));
-      }       
+
+        protected ILogger Logger { get; }
+
+        protected BotService BotService { get; }
+
+        protected LocalizationService LocalizedString { get; }
+
+
+        protected BaseCommand(ILogger logger, LocalizationService localizerService, BotService botService)
+        {
+            Logger = logger;
+            LocalizedString = localizerService;
+            BotService = botService;
+        }
+
+
+        public async Task Execute(long userId, string request, CancellationToken cancellationToken = default)
+        {
+            Request = request;
+            var args = GetArguments(request);
+
+            try
+            {
+                await Execute(userId, args, cancellationToken);
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Executing command /{Command}", Name);
+                await BotService.SendMessage(userId, string.Format(LocalizedString.ErrorProcessingRequest, ex.Message), cancellationToken);
+            }
+        }
+
+
+        protected abstract Task Execute(long userId, string[] args, CancellationToken cancellationToken = default);
+
+
+        public static string[] GetArguments(string request, bool includeCommand = false)
+        {
+            var args = request.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            return includeCommand ? args : args.Skip(1).ToArray();
+        }
     }
-
-
-    protected abstract Task Execute(string[] args, ITelegramBotClient client, long chatId, ILogger logger, IServiceProvider serviceProvider);
-
-
-    private string[] GetArguments(string request)
-    {
-      var args = request.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-      return args.Length > 1 ? args.Skip(1).ToArray() : Array.Empty<string>();
-    }
-  }
 }
